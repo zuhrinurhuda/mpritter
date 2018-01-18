@@ -45,3 +45,5 @@ class UserController {
     .catch(err => res.status(500).send(err))
   }
 }
+
+module.exports = UserController
