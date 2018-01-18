@@ -28,8 +28,37 @@
 </template>
 
 <script>
+import firebase from '../firebase'
+import { mapActions } from 'vuex'
 export default {
-
+  methods: {
+    ...mapActions(['userLogin']),
+    login () {
+      let provider = new firebase.auth.FacebookAuthProvider()
+      firebase.auth().signInWithPopup(provider)
+        .then(result => {
+          // console.log('ini result', result.user)
+          let user = {
+            name: result.user.displayName,
+            email: result.user.email,
+            photo: result.user.photoURL
+          }
+          // console.log('ini user', user)
+          this.userLogin(user)
+            .then(accesstoken => {
+              if (accesstoken) {
+                localStorage.setItem('accesstoken', accesstoken)
+                this.isLogin = true
+              } else {
+                // jika tidak mendapat token dari server, login dianggap gagal
+                alert('Login failed. Please try again!')
+                firebase.auth().signOut()
+              }
+            })
+        })
+        .catch(error => alert('Oops! ' + error))
+    }
+  }
 }
 </script>
 
