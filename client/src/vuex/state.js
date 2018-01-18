@@ -1,6 +1,7 @@
 const state = {
-  userProfile: null,
-  tweets: []
+  user: null,
+  tweets: [],
+  userTweets: []
 }
 
 export default state

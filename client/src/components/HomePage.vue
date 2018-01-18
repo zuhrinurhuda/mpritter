@@ -5,7 +5,8 @@
         <div class="field">
           <textarea rows="5" v-model="tweet"></textarea>
         </div>
-        <button class="ui green button" @click="submitTweet">Tweet</button>
+        <button class="ui green button" v-if="tweet.length > 139" @click="submitTweet">Tweet</button>
+        <button class="ui button" v-else>Tweet</button>
       </div>
       <div class="ui segment" v-for="tweet in tweets" :key="tweet._id">
         <div class="ui comments">  
@@ -16,13 +17,18 @@
             <div class="content">
               <a class="author">{{ tweet.user.name }}</a>
               <div class="metadata">
-                <div class="date"></div>
+                <div class="date">
+                  <span>Post on {{ new Date(tweet.createdAt).toDateString() }}</span>
+                </div>
               </div>
               <div class="text">
                 <p>{{ tweet.content }}</p>
               </div>
+              <div class="hashtags">
+                <p>{{ tweet.hashtags }}</p>
+              </div>
               <div class="actions">
-                <a class="reply" @click="submitDelete(tweet._d)">Delete</a>
+                <a class="reply" v-if="user._id == tweet.user" @click="submitDelete(tweet._id)">Delete</a>
               </div>
             </div>
           </div>
@@ -33,7 +39,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -41,10 +47,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['tweets'])
+    ...mapState(['tweets', 'user']),
+    hashtag () {
+    }
   },
   methods: {
-    ...mapActions(['getTweets', 'addNewTweet']),
+    ...mapActions(['getTweets', 'addNewTweet', 'deleteTweet']),
+    ...mapMutations(['setDeletedTweet']),
     submitTweet () {
       let hashtags = this.tweet.split(' ').filter(word => {
         return word[0] === '#'
@@ -60,11 +69,11 @@ export default {
       this.addNewTweet(newTweet)
     },
     submitDelete (id) {
-      
+      this.setDeletedTweet(id)
+      this.deleteTweet(id)
     }
   },
   mounted () {
-    console.log('masuk')
     this.getTweets()
   }
 }

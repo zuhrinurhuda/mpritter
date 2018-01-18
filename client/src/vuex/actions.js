@@ -47,7 +47,20 @@ const actions = {
       .catch(err => console.log(err))
   },
   deleteTweet: ({ commit }, id) => {
-    
+    http.delete('/tweets/' + id, {
+      headers: { accesstoken: localStorage.getItem('accesstoken') }
+    })
+      .then(({ data }) => {})
+      .catch(err => console.log(err))
+  },
+  getUserTweet: ({ commit }) => {
+    http.get('/tweets/user', {
+      headers: { accesstoken: localStorage.getItem('accesstoken') }
+    })
+      .then(({ data }) => {
+        commit('setUserTweets', data.userTweets)
+      })
+      .catch(err => console.log(err))
   }
 }
 
