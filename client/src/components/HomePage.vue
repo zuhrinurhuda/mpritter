@@ -5,7 +5,9 @@
         <div class="field">
           <textarea rows="5" v-model="tweet"></textarea>
         </div>
+        <button class="ui green button" @click="submitTweet">Tweet</button>
       </div>
+      {{mapState}}
       <div class="ui segment">
         <div class="ui comments">  
           <div class="comment">
@@ -39,10 +41,31 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 export default {
   data () {
     return {
       tweet: ''
+    }
+  },
+  computed: {
+    ...mapState(['mapState'])
+  },
+  methods: {
+    ...mapActions(['addNewTweet']),
+    submitTweet () {
+      let hashtags = this.tweet.split(' ').filter(word => {
+        return word[0] === '#'
+      })
+      let tags = []
+      hashtags.forEach(hashtag => {
+        tags.push(hashtag.slice(1))
+      })
+      let newTweet = {
+        content: this.tweet,
+        hashtags: tags
+      }
+      this.addNewTweet(newTweet)
     }
   }
 }
