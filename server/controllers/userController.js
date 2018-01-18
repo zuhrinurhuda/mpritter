@@ -3,7 +3,7 @@ const generateJwtToken = require('../helpers/generateJwtToken')
 
 class UserController {
   static signupOrLogin (req, res) {
-    console.log('ini req.body', req.body)
+    // console.log('ini req.body', req.body)
     User.findOne({ email: req.body.email })
     .then(user => {
       if (user) {
@@ -49,9 +49,10 @@ class UserController {
   }
 
   static findById(req, res) {
-    User.findById(req.params.id)
+    // console.log(req.decoded)
+    User.findById(req.decoded._id)
     .then(result => res.status(200).json({
-      message: 'Success find all users',
+      message: 'Success find user',
       user: result
     }))
     .catch(err => res.status(500).send(err))
