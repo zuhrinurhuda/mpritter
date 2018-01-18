@@ -20,8 +20,8 @@
         </div>
       </div>
       <div class="right item">
-        <!-- <div class="ui input"><input type="text" placeholder="Search..."></div> -->
-        <button class="ui basic button" @click="login"><i class="facebook icon"></i>Continue with Facebook</button>
+        <button class="ui basic button" v-if="!isLogin" @click="login"><i class="facebook icon"></i>Continue with Facebook</button>
+        <button class="ui basic button" v-else @click="logout"><i class="sign out icon"></i>Logout</button>
       </div>
     </div>
   </div>
@@ -29,10 +29,16 @@
 
 <script>
 import firebase from '../firebase'
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 export default {
+  data () {
+    return {
+      isLogin: false
+    }
+  },
   methods: {
-    ...mapActions(['userLogin']),
+    ...mapActions(['userLogin', 'userProfile']),
+    ...mapMutations(['setUserProfile']),
     login () {
       let provider = new firebase.auth.FacebookAuthProvider()
       firebase.auth().signInWithPopup(provider)
@@ -50,14 +56,29 @@ export default {
                 localStorage.setItem('accesstoken', accesstoken)
                 this.isLogin = true
               } else {
-                // jika tidak mendapat token dari server, login dianggap gagal
                 alert('Login failed. Please try again!')
                 firebase.auth().signOut()
               }
             })
         })
-        .catch(error => alert('Oops! ' + error))
+        .catch(error => alert(error))
+    },
+    logout () {
+      firebase.auth().signOut()
+        .then(() => {
+          this.setUserProfile(null)
+          localStorage.removeItem('accesstoken')
+          this.isLogin = false
+        })
+        .catch(error => alert(error))
+    },
+    checkLoginStatus () {
+      localStorage.getItem('accesstoken') ? this.isLogin = true : this.isLogin = false
     }
+  },
+  mounted () {
+    if (localStorage.getItem('accesstoken')) this.userProfile()
+    this.checkLoginStatus()
   }
 }
 </script>
