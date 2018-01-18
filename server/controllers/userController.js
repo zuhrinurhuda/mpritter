@@ -1,7 +1,43 @@
 const User = require('../models/User')
+const generateJwtToken = require('../helpers/generateJwtToken')
 
 class UserController {
-  static signupOrLogin (req, res) {}
+  static signupOrLogin (req, res) {
+    console.log('ini req.body', req.body)
+    User.findOne({ email: req.body.email })
+    .then(user => {
+      if (user) {
+        // jika user sudah ada
+        generateJwtToken(user)
+        .then(jwtToken => res.status(200).json({
+          message: 'Login success!',
+          accesstoken: jwtToken,
+          user: user
+        }))
+        .catch(err => res.status(500).send(err))
+      } else {
+        // jika user belum ada
+        let newUser = new User({
+          name: req.body.name,
+          email: req.body.email,
+          photo: req.body.photo
+        })
+
+        newUser.save()
+        .then(newUser => {
+          generateJwtToken(newUser)
+          .then(jwtToken => res.status(200).json({
+            message: 'Login success!',
+            accesstoken: jwtToken,
+            user: newUser
+          }))
+          .catch(err => res.status(500).send(err))
+        })
+        .catch(err => res.status(500).send(err))
+      }
+    })
+    .catch(err => res.status(500).send(err))
+  }
 
   static findAll(req, res) {
     User.find()
