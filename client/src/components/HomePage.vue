@@ -7,30 +7,22 @@
         </div>
         <button class="ui green button" @click="submitTweet">Tweet</button>
       </div>
-      {{mapState}}
-      <div class="ui segment">
+      <div class="ui segment" v-for="tweet in tweets" :key="tweet._id">
         <div class="ui comments">  
           <div class="comment">
             <a class="avatar">
-              <img src="">
+              <img :src="tweet.user.photo">
             </a>
             <div class="content">
-              <a class="author"></a>
+              <a class="author">{{ tweet.user.name }}</a>
               <div class="metadata">
                 <div class="date"></div>
               </div>
               <div class="text">
+                <p>{{ tweet.content }}</p>
               </div>
               <div class="actions">
-                <a class="reply">
-                  <i class="comment outline icon"></i>
-                </a>
-                <a class="save">
-                  <i class="retweet icon"></i>
-                </a>
-                <a class="hide">
-                  <i class="empty heart icon"></i>
-                </a>
+                <a class="reply" @click="submitDelete(tweet._d)">Delete</a>
               </div>
             </div>
           </div>
@@ -49,10 +41,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(['mapState'])
+    ...mapState(['tweets'])
   },
   methods: {
-    ...mapActions(['addNewTweet']),
+    ...mapActions(['getTweets', 'addNewTweet']),
     submitTweet () {
       let hashtags = this.tweet.split(' ').filter(word => {
         return word[0] === '#'
@@ -66,7 +58,14 @@ export default {
         hashtags: tags
       }
       this.addNewTweet(newTweet)
+    },
+    submitDelete (id) {
+      
     }
+  },
+  mounted () {
+    console.log('masuk')
+    this.getTweets()
   }
 }
 </script>
